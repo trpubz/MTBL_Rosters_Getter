@@ -24,7 +24,6 @@ class Team:
             for i in range(1, 3 + 1):
                 if "OF" + i.__str__() not in self.roster:
                     self.roster["OF" + i.__str__()] = pid
-                    break
         elif pos == "P":
             for i in range(1, 2 + 1):
                 if "P" + i.__str__() not in self.roster:

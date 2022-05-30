@@ -51,4 +51,6 @@ def TRPJSONSave(directory: str):
 if __name__ == '__main__':
     TRPGetRosters('https://fantasy.espn.com/baseball/league/rosters?leagueId=10998')
     TRPFillRosters()
-    TRPJSONSave(directory="/Users/Shared/BaseballHQ/regseason")
+    directory = "/Users/Shared/BaseballHQ/regseason/"
+    TRPJSONSave(directory=directory)
+    print(f"successfully saved rosters.json to {directory}")
