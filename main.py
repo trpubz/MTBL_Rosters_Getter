@@ -1,7 +1,7 @@
 import json
 
-from DriverKit import DKDriverConfig
-from TRPFrontOffice import Team
+from sources.DriverKit import DKDriverConfig
+from sources.TRPFrontOffice import Team
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
