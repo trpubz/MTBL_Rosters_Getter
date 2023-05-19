@@ -20,13 +20,13 @@ def TRPGetRosters(url: str):
     driver.get(url)
     print("successfully navigated to " + url)
     driver.implicitly_wait(3)
-    rosterElementClassName = "jsx-1671979099.rosterTable"
+    rosterElementClassName = "rosterTable" # sometimes modified by host website
     rosterElements = driver.find_elements(By.CLASS_NAME, rosterElementClassName)
     for ros in rosterElements:
         rosters.append(ros.get_attribute("outerHTML"))
     print("successfully pulled rosters in global variable")
     # Save the list to a temp file
-    with open("tempRawRosters", 'w') as f:
+    with open("tempRawRosters.json", 'w') as f:
         json.dump(rosters, f)
 
     driver.close()
@@ -41,6 +41,7 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
         print("successfully loaded " + lgMngrsFileName)
 
     # if the rosters list is empty, load it from the temp file
+    global rosters # declaring global here quiets the UnboundLocalError
     if len(rosters) == 0:
         with open("tempRawRosters", 'r') as f:
             rosters = json.load(f)
