@@ -1,12 +1,15 @@
 # DriverKit.py
 # by pubins.taylor
 # created 10MAY22
-# v0.1
+# edited 18MAY23
+# v1.0
 # Houses the generics for Selenium WebDriver for multiple uses
 import os
 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def DKDriverConfig(dirDownload: os.path = "root", headless=True) -> webdriver:
@@ -20,11 +23,14 @@ def DKDriverConfig(dirDownload: os.path = "root", headless=True) -> webdriver:
     prefs = {"download.default_directory": dirDownload}
     # example: prefs = {"download.default_directory" : "C:\Tutorial\down"};
     options.add_experimental_option("prefs", prefs)
-    options.headless = headless
+    if headless==True:
+        options.add_argument("--headless")
     # Set the load strategy so that it does not wait for adds to load
     caps = DesiredCapabilities.CHROME
     caps["pageLoadStrategy"] = "none"
-    driver = webdriver.Chrome(options=options, desired_capabilities=caps)
+    # ChromeDriverManager().install() downloads latest version of chrome driver to avoid compatibility issues
+    driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()), desired_capabilities=caps)
+
     return driver
 
 
@@ -40,8 +46,8 @@ def DKDirBuilder(dirDownload: str = "root") -> os.path:
 
     if dirDownload == "root":
         projectRoot = os.path.dirname(__file__)
-        outputPath = projectRoot + '/csvs'
-    elif dirDownload.startswith('C:\\') or dirDownload.startswith('/Users'):
+        outputPath = projectRoot + "/csvs"
+    elif dirDownload.startswith("C:\\") or dirDownload.startswith("/Users"):
         outputPath = dirDownload
     else:
         raise NotADirectoryError()
