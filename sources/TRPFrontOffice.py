@@ -9,8 +9,8 @@ import json
 
 class Team:
 
-    def __init__(self, name: str):
-        self.name: str = name
+    def __init__(self, abbrv: str):
+        self.abbrv: str = abbrv
         self.roster = dict()
 
     def addPlayer(self, pos: str, pid: str):
