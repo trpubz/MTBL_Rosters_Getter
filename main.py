@@ -72,7 +72,7 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
         teams.append(tm)
 
 
-def TRPJSONSave(path: str, fileName: str = "lgrstrs.json"):
+def TRPJSONSave(path: str, fileName: str = "lgrstrs.json") -> bool:
     jsonTeams: json = []
     for tm in teams:
         jsonTeams.append(tm.__dict__)
@@ -80,8 +80,12 @@ def TRPJSONSave(path: str, fileName: str = "lgrstrs.json"):
     with open(os.path.join(path, fileName), "w+") as f:
         json.dump(jsonTeams, f, indent=2)
         f.close()
+        print(f"successfully saved lgrstrs.json to {dirPath}")
+        return True
+    
+    return False
 
-    print(f"successfully saved lgrstrs.json to {dirPath}")
+    
 
 
 if __name__ == '__main__':
@@ -92,5 +96,7 @@ if __name__ == '__main__':
     TRPGetRosters(lgRostersBaseURL + lgID)
     TRPFillRosters(path=dirPath)
 
-    TRPJSONSave(path=dirPath)
-    
+    goodSave = TRPJSONSave(path=dirPath)
+    if goodSave:
+        #delete the temp file
+        os.remove("tempRawRosters.json")
