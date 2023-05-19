@@ -6,6 +6,7 @@ from sources.TRPFrontOffice import Team
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
+import lxml # required for BeautifulSoup
 
 # set global variables
 lgRostersBaseURL = "https://fantasy.espn.com/baseball/league/rosters?leagueId="
@@ -20,7 +21,7 @@ def TRPGetRosters(url: str):
     driver.get(url)
     print("successfully navigated to " + url)
     driver.implicitly_wait(3)
-    rosterElementClassName = "rosterTable" # sometimes modified by host website
+    rosterElementClassName: str = "rosterTable" # sometimes modified by host website
     rosterElements = driver.find_elements(By.CLASS_NAME, rosterElementClassName)
     for ros in rosterElements:
         rosters.append(ros.get_attribute("outerHTML"))
@@ -34,7 +35,7 @@ def TRPGetRosters(url: str):
 
 def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
     # load a local .json file
-    managerKeys: dict
+    managerKeys: list
     with open(os.path.join(path, lgMngrsFileName), "r") as f:
         managerKeys = json.load(f)["data"]  # store only the data and not the schema
         f.close()
@@ -43,36 +44,44 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
     # if the rosters list is empty, load it from the temp file
     global rosters # declaring global here quiets the UnboundLocalError
     if len(rosters) == 0:
-        with open("tempRawRosters", 'r') as f:
+        with open("tempRawRosters.json", 'r') as f:
             rosters = json.load(f)
             f.close()
             print("successfully loaded rosters from temp file")
 
     for ros in rosters:
         soup = BeautifulSoup(ros, "lxml")  # lxml is faster than html.parser
-        teamName = soup.find("span", class_="teamName truncate").text
-        tm = Team(name=teamName)
+        teamName: str = soup.find("span", class_="teamName truncate").text
+        # find the teamAbbreviation from the managerKeys matching the teamName
+        abbrv: str = next((team["teamAbbreviation"] for team in managerKeys if team["teamName"] == teamName), None)
+        tm: Team = Team(abbrv=abbrv) # create a new Team object
+
         players = soup.find("tbody").find_all("tr")
         for plyr in players:
-            pos = plyr.find_all("td")[0].text
-            pidLink: str = plyr.find("div", class_="player-headshot").find("img").get("data-src")
-            if pidLink is None:
-                pidLink: str = plyr.find("div", class_="player-headshot").find("img").get("src")
-            pid: str = pidLink.partition(".png")[0].rpartition("/")[2]
-            if pid == "nomug" and plyr.find_all("td")[1].text == "Empty":
+            # if a position is empty, skip the row
+            if plyr.find_all("td")[1].text == "Empty":
                 continue
+
+            pos: str = plyr.find_all("td")[0].text # position is the first data in the row
+            pidLink: str = plyr.find("div", class_="player-headshot").find("img").get("src")
+            pid: str = pidLink.partition(".png")[0].rpartition("/")[2]
+            # TODO: handle players with no mugshot
+            # if pid == "nomug":
+            #     continue
             tm.addPlayer(pos=pos, pid=pid)
         teams.append(tm)
 
 
-def TRPJSONSave(path: str):
+def TRPJSONSave(path: str, fileName: str = "lgrstrs.json"):
     jsonTeams: json = []
     for tm in teams:
         jsonTeams.append(tm.__dict__)
 
-    with open(path + "lgrstrs.json", "w+") as f:
+    with open(os.path.join(path, fileName), "w+") as f:
         json.dump(jsonTeams, f, indent=2)
         f.close()
+
+    print(f"successfully saved lgrstrs.json to {dirPath}")
 
 
 if __name__ == '__main__':
@@ -84,4 +93,4 @@ if __name__ == '__main__':
     TRPFillRosters(path=dirPath)
 
     TRPJSONSave(path=dirPath)
-    print(f"successfully saved lgrstrs.json to {dirPath}")
+    
