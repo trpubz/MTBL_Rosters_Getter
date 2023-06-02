@@ -6,11 +6,11 @@ from sources.TRPFrontOffice import Team
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
-import lxml # required for BeautifulSoup
 
 # set global variables
 lgRostersBaseURL = "https://fantasy.espn.com/baseball/league/rosters?leagueId="
-
+dirPath = "/Users/Shared/BaseballHQ/resources/extract"
+lgID = "10998"
 rosters: list = list()
 teams: list = list()
 
@@ -82,21 +82,18 @@ def TRPJSONSave(path: str, fileName: str = "lgrstrs.json") -> bool:
         f.close()
         print(f"successfully saved lgrstrs.json to {dirPath}")
         return True
-    
-    return False
-
-    
 
 
-if __name__ == '__main__':
-    dirPath = "/Users/Shared/BaseballHQ/resources/extract"
-    lgID = "10998"
-
+def main():
     # retrieve rosters and store them in global rosters list
     TRPGetRosters(lgRostersBaseURL + lgID)
     TRPFillRosters(path=dirPath)
 
     goodSave = TRPJSONSave(path=dirPath)
     if goodSave:
-        #delete the temp file
+        # delete the temp file
         os.remove("tempRawRosters.json")
+
+
+if __name__ == '__main__':
+    main()
