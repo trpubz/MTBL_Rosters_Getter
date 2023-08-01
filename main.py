@@ -1,9 +1,8 @@
 import json
 import os
 
-from sources.DriverKit import DKDriverConfig
+from driverkit.DriverKit import DKDriverConfig
 from sources.TRPFrontOffice import Team
-
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,8 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 
 # set global variables
 lgRostersBaseURL = "https://fantasy.espn.com/baseball/league/rosters?leagueId="
-dirPath = "/Users/Shared/BaseballHQ/resources/extract"
 lgID = "10998"
+dirPath = "/Users/Shared/BaseballHQ/resources/extract"
 rosters: list = list()
 teams: list = list()
 
@@ -62,7 +61,7 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
         teamName: str = soup.find("span", class_="teamName truncate").text
         # find the teamAbbreviation from the managerKeys matching the teamName
         abbrv: str = next((team["teamAbbreviation"] for team in managerKeys if team["teamName"] == teamName), None)
-        tm: Team = Team(abbrv=abbrv) # create a new Team object
+        tm: Team = Team(abbrv=abbrv)  # create a new Team object
 
         players = soup.find("tbody").find_all("tr")
         for plyr in players:
@@ -70,9 +69,19 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
             if plyr.find_all("td")[1].text == "Empty":
                 continue
 
-            pos: str = plyr.find_all("td")[0].text # position is the first data in the row
-            pidLink: str = plyr.find("div", class_="player-headshot").find("img").get("src")
-            pid: str = pidLink.partition(".png")[0].rpartition("/")[2]
+            pos: str = plyr.find_all("td")[0].text  # position is the first data in the row
+            imgTag = plyr.find("div", class_="player-headshot").find("img")
+            pidLink: str = ""
+            # the playerid link (pidLink) can sometimes be stored in the 'src' tag or in a 'data-src' tag
+            if imgTag.get("data-src") is not None:
+                pidLink = imgTag.get("data-src")
+            elif imgTag.get("src") is not None:
+                pidLink = imgTag.get("src")
+            pid: str = ""
+            try:
+                pid = pidLink.partition(".png")[0].rpartition("/")[2]
+            except AttributeError as ae:
+                print(ae, f"{pidLink}")
             # TODO: handle players with no mugshot
             # if pid == "nomug":
             #     continue
@@ -93,7 +102,7 @@ def TRPJSONSave(path: str, fileName: str = "lgrstrs.json") -> bool:
 
 
 def main():
-    print("\n---starting rosters getter---\n")
+    print("\n---starting Rosters Getter---\n")
     # retrieve rosters and store them in global rosters list
     TRPGetRosters(lgRostersBaseURL + lgID)
     TRPFillRosters(path=dirPath)
@@ -103,7 +112,7 @@ def main():
         # delete the temp file
         os.remove("tempRawRosters.json")
 
-    print("\n---rosters getter complete---")
+    print("\n---Rosters Getter complete---")
 
 
 if __name__ == '__main__':
