@@ -1,8 +1,8 @@
 # Front Office
 # by pubins.taylor
-# v0.1
+# v0.1.1
 # created 24 MAY 2022
-# lastUpdate 26 MAY 2022
+# lastUpdate 01AUG2023
 
 import json
 
@@ -24,6 +24,7 @@ class Team:
             for i in range(1, 3 + 1):
                 if "OF" + i.__str__() not in self.roster:
                     self.roster["OF" + i.__str__()] = pid
+                    break
         elif pos == "P":
             for i in range(1, 2 + 1):
                 if "P" + i.__str__() not in self.roster:
