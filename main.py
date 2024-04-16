@@ -20,7 +20,7 @@ teams: list = list()
 def TRPGetRosters(url: str):
     driver = DKDriverConfig()
     driver.get(url)
-    print("successfully navigated to " + url)
+    # print("successfully navigated to " + url)
     driver.implicitly_wait(3)
     rosterElementClassName: str = "rosterTable"  # sometimes modified by host website
     # wait for the roster elements to load
@@ -32,7 +32,7 @@ def TRPGetRosters(url: str):
 
     for ros in rosterElements:
         rosters.append(ros.get_attribute("outerHTML"))
-    print("successfully pulled rosters in memory")
+    # print("successfully pulled rosters in memory")
     # Save the list to a temp file
     with open("tempRawRosters.json", 'w') as f:
         json.dump(rosters, f)
@@ -40,13 +40,13 @@ def TRPGetRosters(url: str):
     driver.quit()
 
 
-def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
+def TRPFillRosters(path: str, lg_mngrs_file_name: str = "lg_managers.json"):
     # load a local .json file for the league managers
     managerKeys: list
-    with open(os.path.join(path, lgMngrsFileName), "r") as f:
+    with open(os.path.join(path, lg_mngrs_file_name), "r") as f:
         managerKeys = json.load(f)["data"]  # store only the data and not the schema
         f.close()
-        print("successfully loaded " + lgMngrsFileName + " for lgrstrs instantiation")
+        # print("successfully loaded " + lgMngrsFileName + " for lgrstrs instantiation")
 
     # if the rosters list is empty, load it from the temp file
     global rosters  # declaring global here quiets the UnboundLocalError
@@ -54,7 +54,7 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
         with open("tempRawRosters.json", 'r') as f:
             rosters = json.load(f)
             f.close()
-            print("successfully loaded rosters from temp file")
+            # print("successfully loaded rosters from temp file")
 
     for ros in rosters:
         soup = BeautifulSoup(ros, "lxml")  # lxml is faster than html.parser
@@ -89,7 +89,7 @@ def TRPFillRosters(path: str, lgMngrsFileName: str = "lgmngrs.json"):
         teams.append(tm)
 
 
-def TRPJSONSave(path: str, fileName: str = "lgrstrs.json") -> bool:
+def TRPJSONSave(path: str, fileName: str = "lg_rosters.json") -> bool:
     jsonTeams: json = []
     for tm in teams:
         jsonTeams.append(tm.__dict__)
@@ -97,12 +97,12 @@ def TRPJSONSave(path: str, fileName: str = "lgrstrs.json") -> bool:
     with open(os.path.join(path, fileName), "w+") as f:
         json.dump(jsonTeams, f, indent=2)
         f.close()
-        print(f"successfully saved {fileName} to {dirPath}")
+        # print(f"successfully saved {fileName} to {dirPath}")
         return True
 
 
 def main():
-    print("\n---starting Rosters Getter---\n")
+    # print("\n---starting Rosters Getter---\n")
     # retrieve rosters and store them in global rosters list
     TRPGetRosters(lgRostersBaseURL + lgID)
     TRPFillRosters(path=dirPath)
@@ -112,7 +112,7 @@ def main():
         # delete the temp file
         os.remove("tempRawRosters.json")
 
-    print("\n---Rosters Getter complete---")
+    # print("\n---Rosters Getter complete---")
 
 
 if __name__ == '__main__':
