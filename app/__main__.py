@@ -114,7 +114,7 @@ def main():
     goodSave = save_json(path=extract_path)
     if goodSave:
         # delete the temp file
-        os.remove("tempRawRosters.json")
+        os.remove("temp_raw_rosters.json")
 
     print("\n---Rosters Getter complete---")
 
