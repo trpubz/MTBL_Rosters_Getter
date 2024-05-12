@@ -1,8 +1,8 @@
 # Front Office
 # by pubins.taylor
-# v0.1.1
+# v0.1.2
 # created 24 MAY 2022
-# lastUpdate 01AUG2023
+# lastUpdate 11 MAY 2024
 
 import json
 
@@ -15,8 +15,8 @@ class Team:
 
     def addPlayer(self, pos: str, pid: str):
         """
-        Certain positions have multiple occurrences.  The range iterator starts at 1 and ends at the appropriate number
-        for that position.
+        Certain positions have multiple occurrences.  The range iterator starts at 1 and ends at
+        the appropriate number for that position.
         :param pos:  string of the rostered spot
         :param pid:  string of the player id
         """
